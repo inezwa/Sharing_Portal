@@ -1,0 +1,182 @@
+/* BASE STYLES */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    color: #333;
+    background-color: white;
+}
+
+header {
+    background: #2c3e50;
+    color: white;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+nav a{
+    color: white;
+    margin-left: 1rem;
+    text-decoration: none;
+}
+
+/*Search Form*/
+.search-container {
+    margin: 2rem 0;
+}
+
+.search-container input[type="text"] {
+    padding: 0.5rem;
+    width: 300px;
+    border: 1px solid #add;
+    border-radius: 4px;
+}
+
+.search-container button {
+    padding: 0.5rem 1rem;
+    background: #0a83d3;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* Material List */
+.material-list {
+    list-style: none;
+    padding: 0;
+}
+
+.material-item {
+    background: white;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.material-item a {
+    color: #2d20ef;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.upload-info {
+    display: block;
+    color: #7f8c8d;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+}
+
+/* Detail Page Styles */
+.material-detail {
+    background: white;
+    padding: 2rem;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    max-width: 800px;
+    margin: 2rem auto;
+}
+
+.meta {
+    color: #7f8c8d;
+    margin-bottom: 1.5rem;
+    display: flex;
+    gap: 1rem;
+}
+
+.description {
+    margin: 2rem 0;
+}
+
+.download-btn {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    background: #27ae60;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background 0.3s;
+}
+
+.download-btn:hover {
+    background: #2ecc71;
+}
+
+/* Profile Page */
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.profile-pic {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* Ratings */
+.ratings {
+    margin: 2rem 0;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 4px;
+}
+
+.avg-rating {
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+/* Pagination */
+.pagination {
+    margin: 2rem 0;
+    display: flex;
+    justify-content: center;
+}
+
+.pagination a {
+    margin: 0 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid #ddd;
+    text-decoration: none;
+}
+
+.pagination a:hover {
+    background: #eee;
+}
+
+/* Comments Section */
+.comments-section {
+    margin-top: 2rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 4px;
+}
+
+.comment {
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+}
+
+.comment p {
+    margin: 0.5rem 0 0;
+}
+
+/* Approval Badges */
+.approval-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    background: #ffc107;
+    color: #000;
+    border-radius: 3px;
+    font-size: 0.8rem;
+    margin-left: 0.5rem;
+}

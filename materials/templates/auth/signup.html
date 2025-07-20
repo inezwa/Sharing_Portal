@@ -1,0 +1,12 @@
+{% extends 'materials/base.html' %}
+
+{% block content %}
+<h2>Sign Up</h2>
+<form method="post">
+    {%csrf_token %}
+    {{form.as_p}}
+    <button type="submit">Sign Up</button>
+</from>
+<p>Already have an account <a href="{% url 'login' % }">Log in</a></p>
+
+{% endblock %}

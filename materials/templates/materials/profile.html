@@ -1,0 +1,32 @@
+{% extends 'materials/base.html' %}
+
+{% block content %}
+<div class="profile-header">
+    {% if profile_user.profile_picture %}
+        <img src="{{profile_user.profile_picture.url}}"
+            alt="{{profile_user.username}}" class="profile_pic">
+    {% endif %}
+
+    <h2>{{profile_user.username}}</h2> 
+    {% if profile_user.institution %}
+        <p class="institution">{{ profile_user.institution }}</p>
+    {% endif %}
+
+    {% if profile_user.bio %}
+        <p class="bio">{{ profile_user.bio }}</p>
+    {% endif %}
+</div>
+
+<h3>Uploaded Materials</h3>
+<ul class="material-list">
+    {% for material in materials %}
+        <li class="material-item">
+            <a href="{% url 'material-detail' material.pk %}">
+                {{ material.title }} ({{ material.category }})
+            </a>
+        </li>
+    {% empty %}
+        <p>No materials uploaded yet.</p>
+    {% endfor %}
+</ul>
+{% endblock %}
