@@ -19,13 +19,15 @@ def material_list(request):
         )
     
     # Category filter
-    if category_id := request.GET.get('category'):
+    category_id = request.GET.get('category')
+    if category_id:
         materials = materials.filter(category__id=category_id)
     
     # Rating filter
-    if min_rating := request.GET.get('min_rating'):
+    min_rating = request.GET.get('min_rating')
+    if min_rating:
         materials = materials.annotate(
-            avg_rating=Avg('rating__rating')
+            avg_rating=Avg('ratings__rating')
         ).filter(avg_rating__gte=min_rating)
     
     # Ordering
@@ -41,19 +43,18 @@ def material_list(request):
 
     return render(request, 'materials/list.html', {
         'page_obj': page_obj,
-        'query': query,
+        'query': query or '',
         'categories': categories,
         'order': order,
-        'selected_category': category_id if category_id else '',
-        'min_rating': min_rating if min_rating else '',
+        'selected_category': category_id or '',
+        'min_rating': min_rating or '',
     })
 
 
 def material_detail(request, pk):
     material = get_object_or_404(StudyMaterial, pk=pk)
     comments = material.comments.filter(approved=True)
-    
-    # Rating handling
+
     user_rating = None
     if request.user.is_authenticated:
         try:
@@ -61,7 +62,6 @@ def material_detail(request, pk):
         except Rating.DoesNotExist:
             pass
 
-    # Form handling
     comment_form = CommentForm()
     rating_form = RatingForm(instance=user_rating)
 
@@ -84,15 +84,20 @@ def material_detail(request, pk):
                 rating.save()
                 return redirect('material-detail', pk=material.pk)
 
-    average_rating = material.rating_set.aggregate(Avg('rating'))['rating__avg']
+    agg = material.ratings.aggregate(avg_rating=Avg('rating'))
+    average_rating = agg['avg_rating']
+    total_ratings = material.ratings.count()
 
     return render(request, 'materials/detail.html', {
         'material': material,
         'comments': comments,
         'comment_form': comment_form,
         'rating_form': rating_form,
-        'average_rating': average_rating,
+        'average_rating': round(average_rating, 1) if average_rating else None,
+        'total_ratings': total_ratings,
+        'user_rating': user_rating,
     })
+
 
 def signup(request):
     if request.method == 'POST':
@@ -105,6 +110,7 @@ def signup(request):
         form = UserCreationForm()
     return render(request, 'auth/signup.html', {'form': form})
 
+
 @login_required
 def upload_material(request):
     if request.method == 'POST':
@@ -115,28 +121,12 @@ def upload_material(request):
             material.approved = False  # New uploads require approval
             material.save()
             return redirect('material-list')
-    else:
-        form = MaterialForm()
-    return render(request, 'materials/upload.html', {'form': form})
 
 @login_required
 def profile(request, username):
     user = get_object_or_404(User, username=username)
-    user_materials = StudyMaterial.objects.filter(uploaded_by=user, approved=True)  # Only show approved
+    user_materials = StudyMaterial.objects.filter(uploaded_by=user, approved=True)
     return render(request, 'materials/profile.html', {
         'profile_user': user,
         'materials': user_materials
-    })
-
-@login_required
-def dashboard(request):
-    user_materials = StudyMaterial.objects.filter(uploaded_by=request.user)
-    user_comments = Comment.objects.filter(author=request.user)
-    # Materials awaiting approval
-    pending_materials = user_materials.filter(approved=False) 
-
-    return render(request, 'materials/dashboard.html', {
-        'materials': user_materials,
-        'comments': user_comments,
-        'pending_materials': pending_materials,
     })

@@ -2,10 +2,10 @@
 
 {% block content %}
 <div class="material-detail">
-    <h2>{{material.title}}</h2>
+    <h2>{{ material.title }}</h2>
     <div class="material-meta">
-        <p><strong>Category:</strong>{{material.category}}</p>
-        <p><strong>Uploaded by:</strong>{{material.uploaded_by}}</p>
+        <p><strong>Category:</strong> {{ material.category }}</p>
+        <p><strong>Uploaded by:</strong> {{ material.uploaded_by }}</p>
         <p><strong>Uploaded on:</strong> {{ material.upload_date|date:"F d, Y" }}</p>
     </div>
 
@@ -15,8 +15,28 @@
     </div>
 
     <div class="material-download">
-    <a href="{{ material.file.url }}" class="download-btn" download>Download File ({{ materia.file.size|filesizeformat }})</a>
+        <a href="{{ material.file.url }}" class="download-btn" download>Download File ({{ material.file.size|filesizeformat }})</a>
     </div>
+</div>
+
+<div class="rating-section">
+    <h3>Rating: 
+        {% if average_rating %}
+            {{ average_rating }}/5 ({{ total_ratings }} ratings)
+        {% else %}
+            Not rated yet
+        {% endif %}
+    </h3>
+
+    {% if user.is_authenticated %}
+        <form method="post" class="rating-form">
+            {% csrf_token %}
+            {{ rating_form }}
+            <button type="submit" name="rating_submit">Submit Rating</button>
+        </form>
+    {% else %}
+        <p><a href="{% url 'login' %}?next={{ request.path }}">Login to rate</a></p>
+    {% endif %}
 </div>
 
 <div class="comments-section">
@@ -35,8 +55,8 @@
         <h4>Add a comment</h4>
         <form method="post">
             {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit">Post Comment</button>
+            {{ comment_form.as_p }}
+            <button type="submit" name="comment_submit">Post Comment</button>
         </form>
     {% else %}
         <p><a href="{% url 'login' %}?next={{ request.path }}">Login</a> to comment.</p>

@@ -1,8 +1,9 @@
 {% extends 'materials/base.html' %}
+{% load static %}
 
 {% block content %}
 <div class="search-container">
-    <form method="get" action="{% url 'material-list' %}">
+    <form id="search-form">
         <input type="text" name="q" placeholder="Search materials..." value="{{ request.GET.q|default_if_none:'' }}">
 
         <select name="category">
@@ -21,22 +22,24 @@
 </div>
 
 <h2>Study Materials</h2>
-<ul class="material-list">
-    {% for material in page_obj %}
-        <li class="material-item">
-            <a href="{% url 'material-detail' material.pk %}">
-                {{ material.title }} ({{ material.category }})
-            </a>
-            <span class="upload-info">
-                Uploaded by {{ material.uploaded_by }} on {{ material.upload_date|date:"M d, Y" }}
-            </span>
-        </li>
-    {% empty %}
-        <p>No materials found{% if request.GET.q %} matching "{{ request.GET.q }}"{% endif %}.</p>
-    {% endfor %}
-</ul>
+<div id="results-container">
+    <ul class="material-list">
+        {% for material in page_obj %}
+            <li class="material-item">
+                <a href="{% url 'material-detail' material.pk %}">
+                    {{ material.title }} ({{ material.category }})
+                </a>
+                <span class="upload-info">
+                    Uploaded by {{ material.uploaded_by }} on {{ material.upload_date|date:"M d, Y" }}
+                </span>
+            </li>
+        {% empty %}
+            <p>No materials found{% if request.GET.q %} matching "{{ request.GET.q }}"{% endif %}.</p>
+        {% endfor %}
+    </ul>
+</div>
 
-<div class="pagination">
+<div class="pagination" id="pagination-container">
     <span class="step-links">
         {% if page_obj.has_previous %}
             <a href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.min_rating %}&min_rating={{ request.GET.min_rating }}{% endif %}">&laquo; first</a>
@@ -53,4 +56,6 @@
         {% endif %}
     </span>
 </div>
+
+<script src="{% static 'materials/js/material_search.js' %}"></script>
 {% endblock %}

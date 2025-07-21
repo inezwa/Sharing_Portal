@@ -1,0 +1,38 @@
+.rating-section {
+    margin: 1.5rem 0;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 4px;
+}
+
+.rating-form {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.rating-input {
+    width: 60px;
+    padding: 0.5rem;
+}
+
+.star-rating {
+    display: inline-flex;
+    direction: rtl; /* Right-to-left for hover effect */
+}
+
+.star-rating input {
+    display: none;
+}
+
+.star-rating label {
+    color: #ddd;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.star-rating input:checked ~ label,
+.star-rating label:hover,
+.star-rating label:hover ~ label {
+    color: #ffc107;
+}

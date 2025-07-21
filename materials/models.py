@@ -2,6 +2,9 @@ from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+from django.core.validators import MinValueValidator, MaxValueValidator
+from io import BytesIO
 
 # Custom User model
 class User(AbstractUser):
@@ -19,7 +22,7 @@ class Category(models.Model):
     class Meta:
         verbose_name_plural = "Categories"
 
-#  StudyMaterial model
+# StudyMaterial model
 class StudyMaterial(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
@@ -35,7 +38,6 @@ class StudyMaterial(models.Model):
             from pdf2image import convert_from_bytes
             images = convert_from_bytes(default_storage.open(self.file.name).read())
             if images:
-                # Save first page as preview
                 buffer = BytesIO()
                 images[0].save(buffer, format='JPEG')
                 self.preview_image.save(f'preview_{self.id}.jpg', ContentFile(buffer.getvalue()))
@@ -43,19 +45,30 @@ class StudyMaterial(models.Model):
     def __str__(self):
         return self.title
 
-#  Rating model
+# Rating model with related_name='ratings' for StudyMaterial
 class Rating(models.Model):
-    material = models.ForeignKey(StudyMaterial, on_delete=models.CASCADE)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    rating = models.IntegerField(choices=[(i, str(i)) for i in range(1, 6)])
+    material = models.ForeignKey(
+        StudyMaterial,
+        related_name='ratings',  # <-- Updated related_name here
+        on_delete=models.CASCADE
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name='user_ratings',
+        on_delete=models.CASCADE
+    )
+    rating = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)]
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         unique_together = ('material', 'user')
+        verbose_name = 'User Rating'
 
-# Comment System
+# Comment model
 class Comment(models.Model):
-    material = models.ForeignKey('StudYMaterial', on_delete=models.CASCADE, related_name='comments')
+    material = models.ForeignKey('StudyMaterial', on_delete=models.CASCADE, related_name='comments')
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     text = models.TextField()
     created_date = models.DateTimeField(auto_now_add=True)
