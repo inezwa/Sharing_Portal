@@ -41,6 +41,13 @@ class StudyMaterial(models.Model):
                 buffer = BytesIO()
                 images[0].save(buffer, format='JPEG')
                 self.preview_image.save(f'preview_{self.id}.jpg', ContentFile(buffer.getvalue()))
+    
+    class Meta:
+        indexes = [
+            models.Index(fields=['approved', 'upload_date']),
+            models.Index(fields=['title']),
+            models.Index(fields=['category']),
+        ]
 
     def __str__(self):
         return self.title
@@ -65,6 +72,9 @@ class Rating(models.Model):
     class Meta:
         unique_together = ('material', 'user')
         verbose_name = 'User Rating'
+        indexes = [
+            models.Index(fields=['material', 'user']),
+        ]
 
 # Comment model
 class Comment(models.Model):

@@ -1,10 +1,12 @@
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, renderer_classes
+from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from django.db.models import Q, Avg
 from .models import StudyMaterial, Category
 from .serializers import MaterialSerializer
 
 @api_view(['GET'])
+@renderer_classes([JSONRenderer]) 
 def material_search_api(request):
     # Start with approved materials and annotate avg_rating always
     queryset = StudyMaterial.objects.filter(approved=True).annotate(

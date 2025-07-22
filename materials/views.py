@@ -6,8 +6,13 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q, Avg
 from django.core.paginator import Paginator
 from .forms import RatingForm, CommentForm, MaterialForm
+from django.core.cache import cache
 
 def material_list(request):
+    cache_key = f'materials_list_{request.GET.urlencode()}'
+    if cached := cache.get(cache_key):
+        return cached
+
     query = request.GET.get('q')
     materials = StudyMaterial.objects.filter(approved=True)
 
@@ -41,14 +46,18 @@ def material_list(request):
 
     categories = Category.objects.all()
 
-    return render(request, 'materials/list.html', {
+    context = {
         'page_obj': page_obj,
         'query': query or '',
         'categories': categories,
         'order': order,
         'selected_category': category_id or '',
         'min_rating': min_rating or '',
-    })
+    }
+
+    response = render(request, 'materials/list.html', context)
+    cache.set(cache_key, response, timeout=60*15)  # 15 minutes
+    return response
 
 
 def material_detail(request, pk):
@@ -121,6 +130,11 @@ def upload_material(request):
             material.approved = False  # New uploads require approval
             material.save()
             return redirect('material-list')
+    else:
+        form = MaterialForm()  # empty form on GET
+
+    # Always return a response
+    return render(request, 'materials/upload.html', {'form': form})
 
 @login_required
 def profile(request, username):
