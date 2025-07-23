@@ -3,6 +3,8 @@
 {% block content %}
 <div class="material-detail">
     <h2>{{ material.title }}</h2>
+    <p>User: {{ user.username }} | Authenticated: {{ user.is_authenticated }}</p>
+
     <div class="material-meta">
         <p><strong>Category:</strong> {{ material.category }}</p>
         <p><strong>Uploaded by:</strong> {{ material.uploaded_by }}</p>

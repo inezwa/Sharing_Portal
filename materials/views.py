@@ -10,6 +10,8 @@ from django.core.cache import cache
 from django.contrib.auth.views import LogoutView
 
 def material_list(request):
+
+    
     cache_key = f'materials_list_{request.GET.urlencode()}'
     if cached := cache.get(cache_key):
         return cached
@@ -41,7 +43,7 @@ def material_list(request):
     materials = materials.order_by(order)
 
     # Pagination
-    paginator = Paginator(materials, 10)  # 10 per page
+    paginator = Paginator(materials, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
@@ -57,7 +59,7 @@ def material_list(request):
     }
 
     response = render(request, 'materials/list.html', context)
-    cache.set(cache_key, response, timeout=60*15)  # 15 minutes
+    cache.set(cache_key, response, timeout=60*15)
     return response
 
 
@@ -107,6 +109,8 @@ def material_detail(request, pk):
         'total_ratings': total_ratings,
         'user_rating': user_rating,
     })
+
+    
 
 
 def signup(request):

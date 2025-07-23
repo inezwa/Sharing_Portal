@@ -3,9 +3,9 @@
 <h2>Login</h2>
 <form method="post">
     {% csrf_token %}
-    {{form.as_p}}
+    {{ form.as_p }}
     <button type="submit">Login</button>
-</from>
-<p>Don't have an account <a href="{% url 'signup' % }">Sign up</a></p>
+</form>  <!-- fixed the typo from </from> to </form> -->
 
+<p>Don't have an account? <a href="{% url 'signup' %}">Sign up</a></p>  <!-- fixed spacing in URL tag -->
 {% endblock %}

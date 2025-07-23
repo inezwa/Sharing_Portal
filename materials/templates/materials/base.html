@@ -9,22 +9,26 @@
 </head>
 <body>
     <header>
-        <h1>Study Material Portal</h1>
+        <!-- <h1>Study Material Portal</h1> -->
+        <h1><a class="title-home" href="/">Study Material Portal</a></h1>
         <nav>
-    {% if user.is_authenticated %}
-        <span>Hello, {{user.username}}!</span>
-        <a href="{% url 'user-profile' user.username %}">My Profile</a>
-        <a href="{% url 'material-upload' %}">Upload</a>
-        <form method="post" action="{% url 'logout' %}" style="display:inline;">
-            {% csrf_token %}
-            <button type="submit" style="background:none; border:none; color:rgb(255, 255, 255); cursor:pointer; padding:0; font:inherit;">
-                Logout 
-            </button>
-        </form>
-    {% else %}
-        <a href="{% url 'login' %}">Login</a>
-        <a href="{% url 'signup' %}">Signup</a>
-    {% endif %}
+   {% if user.is_authenticated %}
+    <span>Hello, {{ user.username }}!</span>
+    <a href="{% url 'user-profile' user.username %}">My Profile</a>
+    <a href="{% url 'material-upload' %}">Upload</a>
+
+    <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit">Logout</button>
+    </form>
+
+
+
+{% else %}
+    <a href="{% url 'login' %}">Login</a>
+    <a href="{% url 'signup' %}">Signup</a>
+{% endif %}
+
 </nav>
 
     </header>

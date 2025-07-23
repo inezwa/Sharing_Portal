@@ -180,3 +180,9 @@ nav a{
     font-size: 0.8rem;
     margin-left: 0.5rem;
 }
+
+
+.title-home{
+    text-decoration: none;
+    color: white;
+}
