@@ -25,17 +25,21 @@
 <div id="results-container">
     <ul class="material-list">
         {% for material in page_obj %}
-            <li class="material-item">
-                <a href="{% url 'material-detail' material.pk %}">
-                    {{ material.title }} ({{ material.category }})
-                </a>
-                <span class="upload-info">
-                    Uploaded by {{ material.uploaded_by }} on {{ material.upload_date|date:"M d, Y" }}
-                </span>
-            </li>
-        {% empty %}
-            <p>No materials found{% if request.GET.q %} matching "{{ request.GET.q }}"{% endif %}.</p>
-        {% endfor %}
+    <li class="material-item">
+        <a href="{% url 'material-detail' material.pk %}">
+            {% if material.preview_image %}
+                <img src="{{ material.preview_image.url }}" alt="{{ material.title }} preview" style="width:100px; height:auto; vertical-align: middle; margin-right: 10px;">
+            {% endif %}
+            {{ material.title }} ({{ material.category }})
+        </a>
+        <span class="upload-info">
+            Uploaded by {{ material.uploaded_by }} on {{ material.upload_date|date:"M d, Y" }}
+        </span>
+    </li>
+{% empty %}
+    <p>No materials found{% if request.GET.q %} matching "{{ request.GET.q }}"{% endif %}.</p>
+{% endfor %}
+
     </ul>
 </div>
 

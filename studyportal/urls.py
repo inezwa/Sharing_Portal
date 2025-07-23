@@ -15,7 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, reverse_lazy
 from django.conf import settings
 from django.conf.urls.static import static
 from materials import views
@@ -25,10 +25,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('materials.urls')), #includes materials app urls
     path('login/', auth_views.LoginView.as_view(template_name='auth/login.html'), name='login'),
-    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+    path('logout/', auth_views.LogoutView.as_view(next_page='/login/'), name='logout'),
     path('signup/', views.signup, name='signup'), 
     path('user/<str:username>/', views.profile, name='user-profile'),
-    path('', include('materials.urls')),
+    
 
 
 

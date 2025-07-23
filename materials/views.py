@@ -7,6 +7,7 @@ from django.db.models import Q, Avg
 from django.core.paginator import Paginator
 from .forms import RatingForm, CommentForm, MaterialForm
 from django.core.cache import cache
+from django.contrib.auth.views import LogoutView
 
 def material_list(request):
     cache_key = f'materials_list_{request.GET.urlencode()}'
@@ -144,3 +145,7 @@ def profile(request, username):
         'profile_user': user,
         'materials': user_materials
     })
+
+class CustomLogoutView(LogoutView):
+    def get(self, request, *args, **kwargs):
+        return self.post(request, *args, **kwargs)
