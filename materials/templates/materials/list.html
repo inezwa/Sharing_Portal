@@ -2,64 +2,75 @@
 {% load static %}
 
 {% block content %}
-<div class="search-container">
-    <form id="search-form">
-        <input type="text" name="q" placeholder="Search materials..." value="{{ request.GET.q|default_if_none:'' }}">
+<div class="container mt-5">
+    <h2 class="mb-4">Study Materials</h2>
 
-        <select name="category">
-            <option value="">All Categories</option>
-            {% for cat in categories %}
-            <option value="{{ cat.id }}" {% if request.GET.category == cat.id|stringformat:"s" %}selected{% endif %}>
-                {{ cat.name }}
-            </option>
-            {% endfor %}
-        </select>
-
-        <input type="number" name="min_rating" placeholder="Min rating" min="1" max="5" value="{{ request.GET.min_rating|default_if_none:'' }}">
-        
-        <button type="submit">Apply</button>
+    <!-- Filter Form -->
+    <form method="GET" class="row mb-4">
+        <div class="col-md-3 mb-2">
+            <input type="text" name="q" class="form-control" placeholder="Search by title" value="{{ q }}">
+        </div>
+        <div class="col-md-3 mb-2">
+            <select name="category" class="form-control">
+                <option value="">All Categories</option>
+                {% for cat in categories %}
+                    <option value="{{ cat.name }}" {% if cat.name == selected_category %}selected{% endif %}>{{ cat.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3 mb-2">
+            <input type="number" step="0.1" min="0" max="5" name="min_rating" class="form-control" placeholder="Min Rating" value="{{ min_rating }}">
+        </div>
+        <div class="col-md-3 mb-2">
+            <button type="submit" class="btn btn-dark w-100">Apply Filters</button>
+        </div>
     </form>
-</div>
 
-<h2>Study Materials</h2>
-<div id="results-container">
-    <ul class="material-list">
-        {% for material in page_obj %}
-    <li class="material-item">
-        <a href="{% url 'material-detail' material.pk %}">
-            {% if material.preview_image %}
-                <img src="{{ material.preview_image.url }}" alt="{{ material.title }} preview" style="width:100px; height:auto; vertical-align: middle; margin-right: 10px;">
+    <!-- Material List -->
+    {% if page_obj %}
+        <div class="list-group">
+            {% for material in page_obj %}
+            <a href="{% url 'material-detail' material.pk %}" class="list-group-item list-group-item-action">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-1">{{ material.title }}</h5>
+                    <small class="text-muted">{{ material.upload_date|date:"M d, Y" }}</small>
+                </div>
+                <p class="mb-1">{{ material.description|truncatewords:25 }}</p>
+                <small>Uploaded by {{ material.uploaded_by.username }} | Category: {{ material.category }} | Rating: {{ material.average_rating }}</small>
+            </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No study materials found.</p>
+    {% endif %}
+
+    <!-- Pagination -->
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?{% if q %}q={{ q }}&{% endif %}{% if selected_category %}category={{ selected_category }}&{% endif %}{% if min_rating %}min_rating={{ min_rating }}&{% endif %}page={{ page_obj.previous_page_number }}">Previous</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled"><span class="page-link">Previous</span></li>
             {% endif %}
-            {{ material.title }} ({{ material.category }})
-        </a>
-        <span class="upload-info">
-            Uploaded by {{ material.uploaded_by }} on {{ material.upload_date|date:"M d, Y" }}
-        </span>
-    </li>
-{% empty %}
-    <p>No materials found{% if request.GET.q %} matching "{{ request.GET.q }}"{% endif %}.</p>
-{% endfor %}
 
-    </ul>
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                {% else %}
+                    <li class="page-item"><a class="page-link" href="?{% if q %}q={{ q }}&{% endif %}{% if selected_category %}category={{ selected_category }}&{% endif %}{% if min_rating %}min_rating={{ min_rating }}&{% endif %}page={{ num }}">{{ num }}</a></li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?{% if q %}q={{ q }}&{% endif %}{% if selected_category %}category={{ selected_category }}&{% endif %}{% if min_rating %}min_rating={{ min_rating }}&{% endif %}page={{ page_obj.next_page_number }}">Next</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled"><span class="page-link">Next</span></li>
+            {% endif %}
+        </ul>
+    </nav>
 </div>
-
-<div class="pagination" id="pagination-container">
-    <span class="step-links">
-        {% if page_obj.has_previous %}
-            <a href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.min_rating %}&min_rating={{ request.GET.min_rating }}{% endif %}">&laquo; first</a>
-            <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.min_rating %}&min_rating={{ request.GET.min_rating }}{% endif %}">previous</a>
-        {% endif %}
-
-        <span class="current">
-            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
-        </span>
-
-        {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.min_rating %}&min_rating={{ request.GET.min_rating }}{% endif %}">next</a>
-            <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.min_rating %}&min_rating={{ request.GET.min_rating }}{% endif %}">last &raquo;</a>
-        {% endif %}
-    </span>
-</div>
-
-<script src="{% static 'materials/js/material_search.js' %}"></script>
 {% endblock %}

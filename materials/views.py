@@ -10,39 +10,28 @@ from django.core.cache import cache
 from django.contrib.auth.views import LogoutView
 
 def material_list(request):
+    q = request.GET.get('q', '')
+    category = request.GET.get('category', '')
+    min_rating = request.GET.get('min_rating', '')
 
-    
-    cache_key = f'materials_list_{request.GET.urlencode()}'
-    if cached := cache.get(cache_key):
-        return cached
-
-    query = request.GET.get('q')
     materials = StudyMaterial.objects.filter(approved=True)
 
-    # Search filter
-    if query:
-        materials = materials.filter(
-            Q(title__icontains=query) |
-            Q(description__icontains=query)
-        )
-    
-    # Category filter
-    category_id = request.GET.get('category')
-    if category_id:
-        materials = materials.filter(category__id=category_id)
-    
-    # Rating filter
-    min_rating = request.GET.get('min_rating')
-    if min_rating:
-        materials = materials.annotate(
-            avg_rating=Avg('ratings__rating')
-        ).filter(avg_rating__gte=min_rating)
-    
-    # Ordering
-    order = request.GET.get('order', '-upload_date')
-    materials = materials.order_by(order)
+    if q:
+        materials = materials.filter(title__icontains=q)
 
-    # Pagination
+    if category:
+        materials = materials.filter(category__name__iexact=category)
+
+    if min_rating:
+        try:
+            min_rating = float(min_rating)
+            materials = materials.filter(average_rating__gte=min_rating)
+        except ValueError:
+            pass
+
+    # Debug logs
+    print("Total Materials Found:", materials.count())
+
     paginator = Paginator(materials, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -51,16 +40,13 @@ def material_list(request):
 
     context = {
         'page_obj': page_obj,
-        'query': query or '',
         'categories': categories,
-        'order': order,
-        'selected_category': category_id or '',
-        'min_rating': min_rating or '',
+        'q': q,
+        'selected_category': category,
+        'min_rating': min_rating,
     }
 
-    response = render(request, 'materials/list.html', context)
-    cache.set(cache_key, response, timeout=60*15)
-    return response
+    return render(request, 'materials/list.html', context)
 
 
 def material_detail(request, pk):
